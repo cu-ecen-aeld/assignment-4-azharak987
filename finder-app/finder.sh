@@ -1,14 +1,30 @@
-if [ "$#" -lt 2 ]; then
-    echo "Error: Insufficient arguments. Please provide filesdir and searchstr."
-    exit 1
+#!/bin/sh
+
+if [ "$#" -ne 2 ]; then
+	echo "Incorrect number of arguments."
+	echo "Usage: $0 <filesdir> <searchstr>"
+	exit 1
 fi
+
 filesdir="$1"
 searchstr="$2"
-if [ -z "$filesdir" ] || [ ! -d "$filesdir" ]; then
-    echo "Error: '$filesdir' is not a valid directory."
-    exit 1
+
+if [ ! -d "$filesdir" ]; then
+	echo "$1 is not a directory"
+	exit 1
 fi
-num_files=$(find "$filesdir" -type f | wc -l)
-num_matching_lines=$(grep -r "$searchstr" "$filesdir" | wc -l)
-echo "The number of files are $num_files and the number of matching lines are $num_matching_lines"
-exit 0
+
+files=$(find "$filesdir" -type f -exec grep -l "$searchstr" {} +)
+
+file_count=0
+total_line_count=0
+
+for file in $files; do
+	file_count=$(expr $file_count + 1)
+
+	line_count=$(grep -c "$searchstr" "$file")
+
+	total_line_count=$(expr $total_line_count + $line_count)
+done
+
+echo "The number of files are $file_count and the number of matching lines are $total_line_count"

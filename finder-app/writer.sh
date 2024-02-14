@@ -1,15 +1,22 @@
 #!/bin/bash
+
 if [ "$#" -ne 2 ]; then
-    echo "Invalid No. of arguments Please provide writefile and writestr."
-    exit 1
+	echo "Invalid number of arguments"
+	echo "Usage: $0 <writefile> <writestr>"
+	exit 1
 fi
-writefile="$1"
-writestr="$2"
-writepath=$(dirname "$writefile")
-mkdir -p "$writepath"
-echo "$writestr" > "$writefile"
-if [ $? -ne 0 ]; then
-    echo "Error: Cannot Create File"
-    exit 1
+
+writefile=$1
+writestr=$2
+writedir=$(dirname "$writefile")
+
+if [ ! -d "$writedir" ]; then
+	mkdir -p "$writedir"
 fi
-echo "Content written to $writefile."
+
+if touch "$writefile"; then
+	echo "$writestr" > "$writefile"
+else
+	echo "Error creating file"
+fi
+
